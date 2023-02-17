@@ -19,6 +19,12 @@ Then, you'll need to get Eclipse to recognize the project. I think this can be
 done along the lines of the following: Use the top menu to navigate to File >
 Open Projects from File System and open the 'Lab-7' folder.
 
+Once it opens I *think* it's supposed to recognize the git repo, but if it
+doesn't you can make it do so by going to Window > Show View > Other > Git
+Repositories and choosing "Add an existing local repository." Then, you'll be
+able to see what's going on in the Git Staging view (also accessible through the
+Window menu).
+
 Hopefully that all works! If it doesn't I misplanned something terribly, and we
 should figure out how to fix it.
 
