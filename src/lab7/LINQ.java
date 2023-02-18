@@ -87,9 +87,39 @@ public final class LINQ
 	 * @return Returns a new iterable object which concatenates the sequence {@code source_b} to the sequence {@code source_a}.
 	 * @throws NullPointerException Thrown if {@code source_a} or {@code source_b} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Concatenate(Iterable<? extends T> source_a, Iterable<? extends T> source_b)
 	{
+		if (source_a == null || source_b == null)
+			throw new NullPointerException();
+		
+		return new <T> Iterable<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				
+				return new Iterator<T>() {
+
+					@Override
+					public boolean hasNext() {
+						// TODO Auto-generated method stub
+						return false;
+					}
+
+					@Override
+					public T next() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+					
+				};
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+		};
+		// Maybe create a new Iterator and make THAT one work???
+		// For instance, should it basically just cycle through source_a and source_b for its next() and hasNext() calls?
 		return null;
 	}
 	
@@ -120,7 +150,7 @@ public final class LINQ
 	 * @return Returns the number of elements in {@code source}.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> int Count(Iterable<? extends T> source)
 	{
 		return -1;
@@ -136,7 +166,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which iterates each value exactly once without duplicates.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Distinct(Iterable<? extends T> source)
 	{
 		return null;
@@ -151,7 +181,7 @@ public final class LINQ
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 * @throws IndexOutOfBoundsException Thrown if {@code index} is negative or at least {@code Count(source)}.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> T ElementAt(Iterable<T> source, int index)
 	{
 		return null;
@@ -162,7 +192,7 @@ public final class LINQ
 	 * @param <T> The type to iterate.
 	 * @return Returns an empty iterable object with type {@code T}.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Empty()
 	{return new LinkedList<T>();}
 	
@@ -173,7 +203,7 @@ public final class LINQ
 	 * @return Returns true if the sequence is empty and false otherwise.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> boolean Empty(Iterable<? extends T> source)
 	{
 		return false;
@@ -190,7 +220,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which contains all elements of {@code source} not in {@code except}.
 	 * @throws NullPointerException Thrown if {@code source} or {@code except} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Except(Iterable<? extends T> source, Iterable<? extends T> except)
 	{
 		return null;
@@ -206,7 +236,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which iterates the first elements of {@code source}.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <A,B> Iterable<A> First(Iterable<Pair<A,B>> source)
 	{
 		return null;
@@ -223,7 +253,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which contains all elements in both {@code source_a} and {@code source_b}.
 	 * @throws NullPointerException Thrown if {@code source_a} or {@code source_b} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Intersect(Iterable<? extends T> source_a, Iterable<? extends T> source_b)
 	{
 		return null;
@@ -240,7 +270,7 @@ public final class LINQ
 	 * @throws NullPointerException Thrown if {@code source} or {@code cmp} is null.
 	 * @throws NoSuchElementException Thrown if {@code source} is empty.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> T Max(Iterable<? extends T> source, Comparator<T> cmp)
 	{
 		return null;
@@ -257,7 +287,7 @@ public final class LINQ
 	 * @throws NullPointerException Thrown if {@code source} or {@code cmp} is null.
 	 * @throws NoSuchElementException Thrown if {@code source} is empty.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> T Min(Iterable<? extends T> source, Comparator<T> cmp)
 	{
 		return null;
@@ -271,7 +301,7 @@ public final class LINQ
 	 * @return Returns true if no element of {@code source} satisfies {@code predicate} and false otherwise.
 	 * @throws NullPointerException Thrown if {@code source} or {@code predicate} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> boolean None(Iterable<? extends T> source, SingleInputPredicate<T> predicate)
 	{
 		return false;
@@ -289,7 +319,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which pairs the elements of {@code a_source} and {@code b_source} together.
 	 * @throws NullPointerException Thrown if {@code a_source} or {@code b_source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <A,B> Iterable<Pair<A,B>> Pair(Iterable<? extends A> a_source, Iterable<? extends B> b_source)
 	{
 		return null;
@@ -305,11 +335,19 @@ public final class LINQ
 	 * @return Returns a new iterable object with {@code obj} appearing before the elements of {@code source}.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Prepend(Iterable<? extends T> source, T obj)
 	{
 		return null;
 	}
+	
+	/*==========================================================================
+	 * 
+	 * MIDDLE OF THE DOCUMENT
+	 * There are 13 unfinished functions after this point, I believe. This should be a
+	 * little bit less than half.
+	 * 
+	 *==========================================================================*/
 	
 	/**
 	 * Makes an iterable object read only.
@@ -319,7 +357,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which is read only.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> ReadOnly(Iterable<? extends T> source)
 	{
 		return null;
@@ -334,7 +372,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which produces the elements of {@code source} in reverse order.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Reverse(Iterable<? extends T> source)
 	{
 		return null;
@@ -350,7 +388,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which iterates the second elements of {@code source}.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <A,B> Iterable<B> Second(Iterable<Pair<A,B>> source)
 	{
 		return null;
@@ -367,7 +405,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which transforms the original values into a new form according to {@code transformation}.
 	 * @throws NullPointerException Thrown if {@code source} or {@code transformation} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <I,O> Iterable<O> Select(Iterable<? extends I> source, SingleInputTransformation<I,O> transformation)
 	{
 		return null;
@@ -384,7 +422,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which transforms the original values into a new form according to {@code transformation}.
 	 * @throws NullPointerException Thrown if {@code source} or {@code transformation} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <I,O> Iterable<O> Select(Iterable<? extends I> source, DoubleInputTransformation<I,O> transformation)
 	{
 		return null;
@@ -398,7 +436,7 @@ public final class LINQ
 	 * @return Returns true if {@code s1} and {@code s2} are the same sequence and false otherwise.
 	 * @throws NullPointerException Thrown if {@code s1} or {@code s2} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> boolean SequenceEqual(Iterable<? extends T> s1, Iterable<? extends T> s2)
 	{
 		return false;
@@ -459,7 +497,7 @@ public final class LINQ
 	 * @return Returns an array containing the elements of {@code source} in the order the appear in the sequence.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> T[] ToArray(Iterable<? extends T> source)
 	{
 		return null;
@@ -472,7 +510,7 @@ public final class LINQ
 	 * @return Returns an iterable object that iterates over the provided array.
 	 * @throws NullPointerException Thrown if {@code src} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> ToIterable(T[] src)
 	{
 		if(src == null)
@@ -509,7 +547,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which contains all elements in either {@code source_a} or {@code source_b}.
 	 * @throws NullPointerException Thrown if {@code source_a} or {@code source_b} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Union(Iterable<? extends T> source_a, Iterable<? extends T> source_b)
 	{
 		return null;
@@ -526,7 +564,7 @@ public final class LINQ
 	 * @return Returns a new iterable object which iterates only values which satisfy {@code predicate}.
 	 * @throws NullPointerException Thrown if {@code source} or {@code predicate} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <T> Iterable<T> Where(Iterable<? extends T> source, SingleInputPredicate<T> predicate)
 	{
 		if(source == null || predicate == null)
@@ -550,7 +588,7 @@ public final class LINQ
 	 * @return Returns a new sequence which zips the elements of {@code source_a} and {@code source_b} together until one sequence runs out of elements.
 	 * @throws NullPointerException Thrown if {@code source_a}, {@code source_b}, or {@code zip} is null.
 	 */
-	//TODO
+	//TODO implement
 	public static <A,B,O> Iterable<O> Zip(Iterable<? extends A> source_a, Iterable<? extends B> source_b, SingleInputTransformation<Pair<A,B>,O> zip)
 	{
 		return null;
@@ -562,7 +600,7 @@ public final class LINQ
 	 * @param <S> The first type of item to store.
 	 * @param <T> The second type of item to store.
 	 */
-	//TODO
+	//TODO implement
 	public static class Pair<S,T>
 	{
 		/**
@@ -628,7 +666,7 @@ public final class LINQ
 	 * Determines the value of a single input predicate.
 	 * @author Dawn Nye
 	 */
-	//TODO
+	//TODO implement
 	@FunctionalInterface public interface SingleInputPredicate<T>
 	{
 		/**
@@ -641,7 +679,6 @@ public final class LINQ
 	 * Transforms a single input into a new form.
 	 * @author Dawn Nye
 	 */
-	//TODO
 	@FunctionalInterface public interface SingleInputTransformation<I,O>
 	{
 		/**
@@ -654,7 +691,6 @@ public final class LINQ
 	 * Transforms a single input into a new form.
 	 * @author Dawn Nye
 	 */
-	//TODO
 	@FunctionalInterface public interface DoubleInputTransformation<I,O>
 	{
 		/**
