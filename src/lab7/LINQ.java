@@ -82,7 +82,9 @@ public final class LINQ
 	 * <br><br>
 	 * For example, given the sequences {1,2,3} and {4,5,6}, we produce the sequence {1,2,3,4,5,6}.
 	 * @param <T> The iterable type.
-	 * @param source_a The squence which occurs first.
+	 * @param source_a The squence which occurs first.{
+				
+			}
 	 * @param source_b The sequence which occurs second.
 	 * @return Returns a new iterable object which concatenates the sequence {@code source_b} to the sequence {@code source_a}.
 	 * @throws NullPointerException Thrown if {@code source_a} or {@code source_b} is null.
@@ -360,6 +362,8 @@ public final class LINQ
 	//TODO implement
 	public static <T> Iterable<T> ReadOnly(Iterable<? extends T> source)
 	{
+		if(source == null)
+			throw new NullPointerException();
 		return null;
 	}
 	
@@ -372,10 +376,40 @@ public final class LINQ
 	 * @return Returns a new iterable object which produces the elements of {@code source} in reverse order.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> Reverse(Iterable<? extends T> source)
 	{
-		return null;
+		if(source == null)
+			throw new NullPointerException();
+		return new Iterable<T>()
+		{
+			Iterable <T> returnIterable = this;
+			public Iterator<T> iterator()
+			{
+				return new Iterator<T>()
+				{
+					public boolean hasNext()
+					{return obj_unused;}
+					
+					public T next()
+					{
+						if(!hasNext())
+							throw new NoSuchElementException();
+						
+						if(iter.hasNext())
+						{
+							Prepend(returnIterable, iter.next());
+							return iter.next();
+						}
+						
+						obj_unused = false;
+						return null;
+					}
+					protected Iterator<? extends T> iter = source.iterator();
+					protected boolean obj_unused = true;
+				};
+			}
+			this = returnIterable;
+		};
 	}
 	
 	/**
@@ -391,7 +425,35 @@ public final class LINQ
 	//TODO implement
 	public static <A,B> Iterable<B> Second(Iterable<Pair<A,B>> source)
 	{
-		return null;
+		if(source == null)
+			throw new NullPointerException();
+		return new <A,B> Iterable<B>()
+			{
+			public <A,B> Iterator<B> iterator()
+			{
+				@Override
+				public Iterator<B> iterator() {
+					public boolean hasNext()
+					{return end;}
+					
+					public B next()
+					{
+						if(!hasNext())
+							throw new NoSuchElementException();
+						
+						if(iter.hasNext()) {
+							return iter.next().Item2;
+						}
+							
+						end = false;
+						return this.next();
+					}
+					protected Iterator<Pair<A,B>> iter = source.iterator();
+					protected boolean end = true;
+					return null;
+				}
+			}
+		};
 	}
 	
 	/**
@@ -408,6 +470,8 @@ public final class LINQ
 	//TODO implement
 	public static <I,O> Iterable<O> Select(Iterable<? extends I> source, SingleInputTransformation<I,O> transformation)
 	{
+		if(source == null || transformation == null)
+			throw new NullPointerException();
 		return null;
 	}
 	
@@ -425,6 +489,8 @@ public final class LINQ
 	//TODO implement
 	public static <I,O> Iterable<O> Select(Iterable<? extends I> source, DoubleInputTransformation<I,O> transformation)
 	{
+		if(source == null || transformation == null)
+			throw new NullPointerException();
 		return null;
 	}
 	
@@ -436,10 +502,18 @@ public final class LINQ
 	 * @return Returns true if {@code s1} and {@code s2} are the same sequence and false otherwise.
 	 * @throws NullPointerException Thrown if {@code s1} or {@code s2} is null.
 	 */
-	//TODO implement
 	public static <T> boolean SequenceEqual(Iterable<? extends T> s1, Iterable<? extends T> s2)
 	{
-		return false;
+		if(s1 == null || s2 == null)
+			throw new NullPointerException();
+		Iterator<? extends T> iter1 = s1.iterator();
+		Iterator<? extends T> iter2 = s2.iterator();
+		while(iter1.hasNext() && iter2.hasNext())
+		{
+			if(!(iter1.next().equals(iter2.next())))
+				return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -497,10 +571,22 @@ public final class LINQ
 	 * @return Returns an array containing the elements of {@code source} in the order the appear in the sequence.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO implement
 	public static <T> T[] ToArray(Iterable<? extends T> source)
 	{
-		return null;
+		if(source == null)
+			throw new NullPointerException();
+		Iterator<? extends T> iter = source.iterator();
+		int count = 0;
+		for(T t : source)
+		{count++;}
+		T[] arr = (T[])new Object[count];
+		count = 0;
+		while(iter.hasNext())
+		{
+			arr[count] = iter.next();
+			count++;
+		}
+		return arr;
 	}
 	
 	/**
@@ -510,7 +596,6 @@ public final class LINQ
 	 * @return Returns an iterable object that iterates over the provided array.
 	 * @throws NullPointerException Thrown if {@code src} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> ToIterable(T[] src)
 	{
 		if(src == null)
@@ -531,8 +616,6 @@ public final class LINQ
 					private T[] arr = src;
 				};
 			}
-			
-	
 		};
 	}
 	
@@ -547,10 +630,17 @@ public final class LINQ
 	 * @return Returns a new iterable object which contains all elements in either {@code source_a} or {@code source_b}.
 	 * @throws NullPointerException Thrown if {@code source_a} or {@code source_b} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> Union(Iterable<? extends T> source_a, Iterable<? extends T> source_b)
 	{
-		return null;
+		if(source_a == null || source_b == null)
+			throw new NullPointerException();
+		Iterator<? extends T> iterb = source_b.iterator();
+		while(iterb.hasNext())
+		{
+			if(!(Contains(source_a, iterb.next())))
+				Append(source_a, iterb.next());
+		}
+		return (Iterable<T>) source_a;
 	}
 	
 	/**
@@ -588,10 +678,37 @@ public final class LINQ
 	 * @return Returns a new sequence which zips the elements of {@code source_a} and {@code source_b} together until one sequence runs out of elements.
 	 * @throws NullPointerException Thrown if {@code source_a}, {@code source_b}, or {@code zip} is null.
 	 */
-	//TODO implement
 	public static <A,B,O> Iterable<O> Zip(Iterable<? extends A> source_a, Iterable<? extends B> source_b, SingleInputTransformation<Pair<A,B>,O> zip)
 	{
-		return null;
+		if(source_a == null || source_b == null || zip == null)
+			throw new NullPointerException();
+		Iterator<? extends A> itera = source_a.iterator();
+		Iterator<? extends B> iterb = source_b.iterator();
+		return new Iterable<O>()
+			{
+				public Iterator<O> iterator()
+				{
+					return new Iterator<O>()
+					{
+						public boolean hasNext()
+						{return not_done;}
+						
+						public O next()
+						{
+							if(!hasNext())
+								throw new NoSuchElementException();
+							
+							if(itera.hasNext() && iterb.hasNext())
+								return (O) zip.Evaluate(new Pair(itera.next(), iterb.next()));
+							
+							
+							not_done = false;
+							return null;
+						}
+						protected boolean not_done = true;
+					};
+				}
+			};
 	}
 	
 	/**
@@ -600,7 +717,6 @@ public final class LINQ
 	 * @param <S> The first type of item to store.
 	 * @param <T> The second type of item to store.
 	 */
-	//TODO implement
 	public static class Pair<S,T>
 	{
 		/**
@@ -666,7 +782,6 @@ public final class LINQ
 	 * Determines the value of a single input predicate.
 	 * @author Dawn Nye
 	 */
-	//TODO implement
 	@FunctionalInterface public interface SingleInputPredicate<T>
 	{
 		/**
