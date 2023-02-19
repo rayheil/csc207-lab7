@@ -44,6 +44,7 @@ public final class LINQ
 	 * @param obj The item to append to the end of the sequence.
 	 * @return Returns a new iterable object with {@code obj} following the elements of {@code source}.
 	 * @throws NullPointerException Thrown if {@code source} is null.
+	 * @author Dawn Nye
 	 */
 	public static <T> Iterable<T> Append(Iterable<? extends T> source, T obj)
 	{
@@ -63,13 +64,15 @@ public final class LINQ
 						if(!hasNext())
 							throw new NoSuchElementException();
 						
+						// Return the next item of the source iterator if it exists
 						if(iter.hasNext())
 							return iter.next();
 						
+						// If it does not exist, return the appended item and exhaust this iterator
 						obj_unused = false;
 						return obj;
 					}
-					
+			
 					protected Iterator<? extends T> iter = source.iterator();
 					protected boolean obj_unused = true;
 				};
@@ -89,40 +92,41 @@ public final class LINQ
 	 * @return Returns a new iterable object which concatenates the sequence {@code source_b} to the sequence {@code source_a}.
 	 * @throws NullPointerException Thrown if {@code source_a} or {@code source_b} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> Concatenate(Iterable<? extends T> source_a, Iterable<? extends T> source_b)
 	{
 		if (source_a == null || source_b == null)
 			throw new NullPointerException();
 		
-		return new <T> Iterable<T>() {
-
+		return new Iterable<T>()
+		{
 			@Override
-			public Iterator<T> iterator() {
-				
-				return new Iterator<T>() {
-
+			public Iterator<T> iterator()
+			{
+				return new Iterator<T>()
+				{
 					@Override
-					public boolean hasNext() {
-						// TODO Auto-generated method stub
-						return false;
+					public boolean hasNext()
+					{
+						return (iter_a.hasNext() || iter_b.hasNext());
 					}
 
 					@Override
-					public T next() {
-						// TODO Auto-generated method stub
-						return null;
+					public T next()
+					{
+						if (!hasNext())
+							throw new NoSuchElementException();
+						
+						// First return any items in iter_a, only then begin to use items from iter_b
+						if (iter_a.hasNext())
+							return iter_a.next();
+						return iter_b.next();
 					}
 					
+					protected Iterator<? extends T> iter_a = source_a.iterator();
+					protected Iterator<? extends T> iter_b = source_b.iterator();
 				};
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
+			}			
 		};
-		// Maybe create a new Iterator and make THAT one work???
-		// For instance, should it basically just cycle through source_a and source_b for its next() and hasNext() calls?
-		return null;
 	}
 	
 	/**
@@ -152,10 +156,19 @@ public final class LINQ
 	 * @return Returns the number of elements in {@code source}.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO implement
 	public static <T> int Count(Iterable<? extends T> source)
 	{
-		return -1;
+		if (source == null)
+			throw new NullPointerException();
+		
+		int count = 0;
+		Iterator<? extends T> it = source.iterator();
+		while (it.hasNext())
+		{
+			it.next();
+			count++;
+		}
+		return count;
 	}
 	
 	/**
@@ -168,10 +181,63 @@ public final class LINQ
 	 * @return Returns a new iterable object which iterates each value exactly once without duplicates.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> Distinct(Iterable<? extends T> source)
 	{
-		return null;
+		if (source == null)
+			throw new NullPointerException();
+		
+		return new Iterable<T>()
+		{
+			public Iterator<T> iterator()
+			{
+				return new Iterator<T>()
+				{
+					@Override
+					public boolean hasNext()
+					{
+						// If a nextItem already exists, no problem!
+						if(nextItem != null)
+							return true;
+					
+						/* If it does not exist, search for one in the source iterator.
+						 * If we find a unique element that's great!
+						 * If not, we really are out of items to iterate over.
+						 */
+						while(it.hasNext())
+						{
+							T temp = it.next();
+							
+							if(!seenItems.contains(temp))
+							{
+								nextItem = temp;
+								seenItems.add(temp);
+								return true;
+							}
+						}
+						return false;
+					}
+					
+					@Override
+					public T next()
+					{
+						// Since we always check hasNext, it will continue to cycle nextItem as needed
+						if(!hasNext())
+							throw new NoSuchElementException();
+						
+						T ret = nextItem;
+						nextItem = null; // set nextItem to null so a new one will be found
+						return ret;
+					}
+					
+					
+					protected Iterator<? extends T> it = source.iterator();
+					// TODO for seenItems we could use something different like a HashSet,
+					// but we already import LinkedList so I figured it would be better.
+					protected LinkedList<T> seenItems = new LinkedList<T>();
+					protected T nextItem = null;
+				};
+			}
+		};
 	}
 	
 	/**
@@ -183,10 +249,20 @@ public final class LINQ
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 * @throws IndexOutOfBoundsException Thrown if {@code index} is negative or at least {@code Count(source)}.
 	 */
-	//TODO implement
 	public static <T> T ElementAt(Iterable<T> source, int index)
 	{
-		return null;
+		if (source == null)
+			throw new NullPointerException();
+		
+		if (index < 0 || index >= Count(source))
+			throw new IndexOutOfBoundsException();
+		
+		T currentItem = null;
+		Iterator<T> it = source.iterator();
+		for (int i = 0; i < index; i++)
+			currentItem = it.next();
+		
+		return currentItem;
 	}
 	
 	/**
@@ -194,7 +270,6 @@ public final class LINQ
 	 * @param <T> The type to iterate.
 	 * @return Returns an empty iterable object with type {@code T}.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> Empty()
 	{return new LinkedList<T>();}
 	
@@ -205,10 +280,12 @@ public final class LINQ
 	 * @return Returns true if the sequence is empty and false otherwise.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO implement
 	public static <T> boolean Empty(Iterable<? extends T> source)
 	{
-		return false;
+		if (source == null)
+			throw new NullPointerException();
+		
+		return (!source.iterator().hasNext());
 	}
 	
 	/**
@@ -222,10 +299,13 @@ public final class LINQ
 	 * @return Returns a new iterable object which contains all elements of {@code source} not in {@code except}.
 	 * @throws NullPointerException Thrown if {@code source} or {@code except} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> Except(Iterable<? extends T> source, Iterable<? extends T> except)
 	{
-		return null;
+		if (source == null || except == null)
+			throw new NullPointerException();
+		
+		// We want all elements of source that are NOT in except 
+		return Where(source, t -> !Contains(except, t));
 	}
 	
 	/**
@@ -238,10 +318,33 @@ public final class LINQ
 	 * @return Returns a new iterable object which iterates the first elements of {@code source}.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO implement
 	public static <A,B> Iterable<A> First(Iterable<Pair<A,B>> source)
 	{
-		return null;
+		if(source == null)
+			throw new NullPointerException();
+		
+		return new Iterable<A>()
+		{
+			public Iterator<A> iterator()
+			{
+				return new Iterator<A>()
+				{
+					@Override
+					public boolean hasNext() 
+					{return it.hasNext();}
+
+					@Override
+					public A next()
+					{
+						if (!hasNext())
+							throw new NoSuchElementException();
+						return it.next().Item1;
+					}
+					
+					Iterator<Pair<A,B>> it = source.iterator();
+				};
+			}
+		};
 	}
 	
 	/**
@@ -255,10 +358,13 @@ public final class LINQ
 	 * @return Returns a new iterable object which contains all elements in both {@code source_a} and {@code source_b}.
 	 * @throws NullPointerException Thrown if {@code source_a} or {@code source_b} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> Intersect(Iterable<? extends T> source_a, Iterable<? extends T> source_b)
 	{
-		return null;
+		if (source_a == null || source_b == null)
+			throw new NullPointerException();
+		
+		// We want all elements of source_a that are ALSO in source_b
+		return Where(source_a, t -> Contains(source_b, t));
 	}
 	
 	/**
@@ -272,10 +378,25 @@ public final class LINQ
 	 * @throws NullPointerException Thrown if {@code source} or {@code cmp} is null.
 	 * @throws NoSuchElementException Thrown if {@code source} is empty.
 	 */
-	//TODO implement
 	public static <T> T Max(Iterable<? extends T> source, Comparator<T> cmp)
 	{
-		return null;
+		if (source == null)
+			throw new NullPointerException();
+		
+		if (Empty(source))
+			throw new NoSuchElementException();
+		
+		Iterator<? extends T> it = source.iterator();
+		T maxItem = it.next();
+		T currentItem = null;
+		while (it.hasNext()) 
+		{
+			currentItem = it.next();
+			if (cmp.compare(maxItem, currentItem) < 0)
+				maxItem = currentItem;
+		}
+		
+		return maxItem;
 	}
 	
 	/**
@@ -289,10 +410,25 @@ public final class LINQ
 	 * @throws NullPointerException Thrown if {@code source} or {@code cmp} is null.
 	 * @throws NoSuchElementException Thrown if {@code source} is empty.
 	 */
-	//TODO implement
 	public static <T> T Min(Iterable<? extends T> source, Comparator<T> cmp)
 	{
-		return null;
+		if (source == null)
+			throw new NullPointerException();
+		
+		if (Empty(source))
+			throw new NoSuchElementException();
+		
+		Iterator<? extends T> it = source.iterator();
+		T minItem = it.next();
+		T currentItem = null;
+		while (it.hasNext()) 
+		{
+			currentItem = it.next();
+			if (cmp.compare(minItem, currentItem) > 0)
+				minItem = currentItem;
+		}
+		
+		return minItem;
 	}
 	
 	/**
@@ -303,10 +439,14 @@ public final class LINQ
 	 * @return Returns true if no element of {@code source} satisfies {@code predicate} and false otherwise.
 	 * @throws NullPointerException Thrown if {@code source} or {@code predicate} is null.
 	 */
-	//TODO implement
 	public static <T> boolean None(Iterable<? extends T> source, SingleInputPredicate<T> predicate)
 	{
-		return false;
+		if (source == null)
+			throw new NullPointerException();
+		
+		// None passing is the same as all not passing the predicate.
+		// Also, we need another little lambda expression since it's predicate.Evaluate
+		return All(source, t -> !predicate.Evaluate(t));
 	}
 	
 	/**
@@ -321,10 +461,36 @@ public final class LINQ
 	 * @return Returns a new iterable object which pairs the elements of {@code a_source} and {@code b_source} together.
 	 * @throws NullPointerException Thrown if {@code a_source} or {@code b_source} is null.
 	 */
-	//TODO implement
 	public static <A,B> Iterable<Pair<A,B>> Pair(Iterable<? extends A> a_source, Iterable<? extends B> b_source)
 	{
-		return null;
+		return new Iterable<Pair<A,B>>()
+		{
+			@Override
+			public Iterator<Pair<A, B>> iterator()
+			{
+				return new Iterator<Pair<A,B>>()
+				{
+					@Override
+					public boolean hasNext()
+					{
+						// There is only a next pair if both source iterators have a next item
+						return (a_it.hasNext() && b_it.hasNext());
+					}
+
+					@Override
+					public Pair<A, B> next()
+					{
+						if (!hasNext())
+							throw new NoSuchElementException();
+						
+						return new Pair<A,B>(a_it.next(), b_it.next());
+					}
+					
+					Iterator<? extends A> a_it = a_source.iterator();
+					Iterator<? extends B> b_it = b_source.iterator();
+				};
+			}
+		};
 	}
 	
 	/**
@@ -337,10 +503,45 @@ public final class LINQ
 	 * @return Returns a new iterable object with {@code obj} appearing before the elements of {@code source}.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> Prepend(Iterable<? extends T> source, T obj)
 	{
-		return null;
+		if (source == null)
+			throw new NullPointerException();
+		
+		return new Iterable<T>()
+		{
+			@Override
+			public Iterator<T> iterator() 
+			{
+				return new Iterator<T>()
+				{
+					@Override
+					public boolean hasNext()
+					{
+						// This or is necessary because the source iterator may start with no items
+						return (obj_unused || it.hasNext());
+					}
+
+					@Override
+					public T next()
+					{
+						if (!hasNext())
+							throw new NoSuchElementException();
+						
+						// Return the appended object first, then move onto the source iterator
+						if (obj_unused)
+						{
+							obj_unused = false;
+							return obj;
+						}
+						return it.next();
+					}
+					
+					boolean obj_unused = true;
+					Iterator<? extends T> it = source.iterator();
+				};
+			}
+		};
 	}
 	
 	/*==========================================================================
@@ -428,11 +629,12 @@ public final class LINQ
 		if(source == null)
 			throw new NullPointerException();
 		return new <A,B> Iterable<B>()
-			{
+		{
 			public <A,B> Iterator<B> iterator()
 			{
 				@Override
-				public Iterator<B> iterator() {
+				public Iterator<B> iterator()
+				{
 					public boolean hasNext()
 					{return end;}
 					
@@ -441,7 +643,8 @@ public final class LINQ
 						if(!hasNext())
 							throw new NoSuchElementException();
 						
-						if(iter.hasNext()) {
+						if(iter.hasNext())
+						{
 							return iter.next().Item2;
 						}
 							
@@ -552,6 +755,7 @@ public final class LINQ
 	{
 		if(source == null || operation == null)
 			throw new NullPointerException();
+		
 		T prevResult = null;
 		Iterator<? extends T> iterator = source.iterator();
 		while(iterator.hasNext())
@@ -600,10 +804,11 @@ public final class LINQ
 	{
 		if(src == null)
 			throw new NullPointerException();
-		return new <T> Iterable<T>() {
-
+		return new <T> Iterable<T>()
+		{
 			@Override
-			public Iterator<T> iterator() {
+			public Iterator<T> iterator()
+			{
 				return new Iterator<T>()
 				{
 					public boolean hasNext()
