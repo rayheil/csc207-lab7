@@ -2,6 +2,7 @@ package lab7;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -27,9 +28,10 @@ public final class LINQ
 	{
 		if(source == null || predicate == null)
 			throw new NullPointerException();
+		
 		for(T t : source)
 		{
-			if(!(predicate.Evaluate(t)))
+			if(!predicate.Evaluate(t))
 				return false;
 		}
 		return true;
@@ -50,6 +52,7 @@ public final class LINQ
 	{
 		if(source == null)
 			throw new NullPointerException();
+		
 		return new Iterable<T>()
 		{
 			public Iterator<T> iterator()
@@ -73,7 +76,14 @@ public final class LINQ
 						return obj;
 					}
 			
+					/**
+					 * Iterator over the source.
+					 */
 					protected Iterator<? extends T> iter = source.iterator();
+					
+					/**
+					 * Whether the appended object is still unused (has not been returned).
+					 */
 					protected boolean obj_unused = true;
 				};
 			}
@@ -85,9 +95,7 @@ public final class LINQ
 	 * <br><br>
 	 * For example, given the sequences {1,2,3} and {4,5,6}, we produce the sequence {1,2,3,4,5,6}.
 	 * @param <T> The iterable type.
-	 * @param source_a The squence which occurs first.{
-				
-			}
+	 * @param source_a The squence which occurs first.
 	 * @param source_b The sequence which occurs second.
 	 * @return Returns a new iterable object which concatenates the sequence {@code source_b} to the sequence {@code source_a}.
 	 * @throws NullPointerException Thrown if {@code source_a} or {@code source_b} is null.
@@ -122,7 +130,14 @@ public final class LINQ
 						return iter_b.next();
 					}
 					
+					/**
+					 * Iterator for the first source.
+					 */
 					protected Iterator<? extends T> iter_a = source_a.iterator();
+					
+					/**
+					 * Iterator for the second source.
+					 */
 					protected Iterator<? extends T> iter_b = source_b.iterator();
 				};
 			}			
@@ -141,6 +156,7 @@ public final class LINQ
 	{
 		if(source == null)
 			throw new NullPointerException();
+		
 		for(T t : source)
 		{
 			if(t.equals(obj))
@@ -162,12 +178,8 @@ public final class LINQ
 			throw new NullPointerException();
 		
 		int count = 0;
-		Iterator<? extends T> it = source.iterator();
-		while (it.hasNext())
-		{
-			it.next();
+		for (@SuppressWarnings("unused") T t : source)
 			count++;
-		}
 		return count;
 	}
 	
@@ -229,11 +241,21 @@ public final class LINQ
 						return ret;
 					}
 					
-					
+					/**
+					 * Iterator for the source.
+					 */
 					protected Iterator<? extends T> it = source.iterator();
-					// TODO for seenItems we could use something different like a HashSet,
-					// but we already import LinkedList so I figured it would be better.
-					protected LinkedList<T> seenItems = new LinkedList<T>();
+					
+					/**
+					 * Items that have already been iterated through.
+					 * It will likely not be noticeable in our use case,
+					 * but HashSet.contains is O(1) as opposed to O(n).
+					 */
+					protected HashSet<T> seenItems = new HashSet<T>();
+					
+					/**
+					 * The next item to be returned. Calculated as needed.
+					 */
 					protected T nextItem = null;
 				};
 			}
@@ -260,8 +282,10 @@ public final class LINQ
 		T currentItem = null;
 		Iterator<T> it = source.iterator();
 		for (int i = 0; i < index; i++)
+		{
+			// Since we already checked bounds, there's no need to check in the loop
 			currentItem = it.next();
-		
+		}
 		return currentItem;
 	}
 	
