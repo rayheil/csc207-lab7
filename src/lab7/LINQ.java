@@ -584,7 +584,6 @@ public final class LINQ
 	 * @return Returns a new iterable object which is read only.
 	 * @throws NullPointerException Thrown if {@code source} is null.
 	 */
-	//TODO implement
 	public static <T> Iterable<T> ReadOnly(Iterable<? extends T> source)
 	{
 		if(source == null)
