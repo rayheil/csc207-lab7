@@ -589,7 +589,38 @@ public final class LINQ
 	{
 		if(source == null)
 			throw new NullPointerException();
-		return null;
+		
+		return new Iterable<T>()
+		{
+			@Override
+			public Iterator<T> iterator()
+			{
+				return new Iterator<T>()
+				{
+					@Override
+					public boolean hasNext() {
+						return it.hasNext();
+					}
+
+					@Override
+					public T next() {
+						if (!hasNext())
+							throw new NoSuchElementException();
+						return it.next();
+					}
+					
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+					
+					/**
+					 * Source iterator
+					 */
+					Iterator<? extends T> it = source.iterator();
+				};
+			}	
+		};
 	}
 	
 	/**
