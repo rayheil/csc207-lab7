@@ -279,11 +279,11 @@ public final class LINQ
 		if (index < 0 || index >= Count(source))
 			throw new IndexOutOfBoundsException();
 		
-		T currentItem = null;
 		Iterator<T> it = source.iterator();
-		for (int i = 0; i < index; i++)
+		T currentItem = it.next();
+		
+		for(int i = 0; i < index; i++)
 		{
-			// Since we already checked bounds, there's no need to check in the loop
 			currentItem = it.next();
 		}
 		return currentItem;
@@ -487,6 +487,9 @@ public final class LINQ
 	 */
 	public static <A,B> Iterable<Pair<A,B>> Pair(Iterable<? extends A> a_source, Iterable<? extends B> b_source)
 	{
+		if(a_source == null || b_source == null)
+			throw new NullPointerException();
+		
 		return new Iterable<Pair<A,B>>()
 		{
 			@Override
@@ -638,33 +641,22 @@ public final class LINQ
 		
 		return new Iterable<T>(){
 			
-			//make this able to be used by prepend
-			Iterable<T> returnIterable = this;
-			
 			public Iterator<T> iterator(){
 				
 				return new Iterator<T>(){
-					//standard hasNext
+					//if index >= 0, there is still more of arr
 					public boolean hasNext()
-					{return unfinished;}
+					{return (currentIndex >= 0);}
 					
 					public T next()
 					{
 						if(!hasNext())
 							throw new NoSuchElementException();
-						
-						//If we have a next in source, we prepend it to new iterator
-						if(iter.hasNext())
-						{
-							Prepend(returnIterable, iter.next());
-							return iter.next();
-						}
-						
-						unfinished = false;
-						return null;
+	
+						return arr[currentIndex--];
 					}
-					protected Iterator<? extends T> iter = source.iterator();
-					protected boolean unfinished = true;
+					protected T[] arr = ToArray(source);
+					protected int currentIndex = arr.length - 1;
 				};
 			}
 		};
@@ -880,7 +872,7 @@ public final class LINQ
 		//while source has a next, perform the provided operation on the next and previous
 		while(iterator.hasNext())
 		{
-			prevResult = operation.Evaluate(iterator.next(), prevResult);
+			prevResult = operation.Evaluate(prevResult, iterator.next());
 		}
 		return prevResult;
 	}
@@ -969,15 +961,7 @@ public final class LINQ
 		if(source_a == null || source_b == null)
 			throw new NullPointerException();
 		
-		Iterator<? extends T> iterb = source_b.iterator();
-		
-		while(iterb.hasNext())
-		{
-			T temp = iterb.next();
-			if(!(Contains(source_a, temp)))
-				Append(source_a, temp);
-		}
-		return (Iterable<T>) source_a;
+		return Distinct(Concatenate(source_a, source_b));
 	}
 	
 	/**
@@ -1007,7 +991,7 @@ public final class LINQ
 						if(nextItem != null)
 							return true;
 					
-						while(nextItem == null)
+						while(iter.hasNext())
 						{
 							T temp = iter.next();
 							if(predicate.Evaluate(temp))
@@ -1058,33 +1042,29 @@ public final class LINQ
 	{
 		if(source_a == null || source_b == null || zip == null)
 			throw new NullPointerException();
-		Iterator<? extends A> itera = source_a.iterator();
-		Iterator<? extends B> iterb = source_b.iterator();
+
+		Iterable<Pair<A,B>> paired = Pair(source_a, source_b);
+		Iterator<Pair<A,B>> pairedIter = paired.iterator();
+
 		return new Iterable<O>()
+		{
+			public Iterator<O> iterator()
 			{
-				public Iterator<O> iterator()
+				return new Iterator<O>()
 				{
-					return new Iterator<O>()
+					public boolean hasNext()
+					{return pairedIter.hasNext();}
+
+					public O next()
 					{
-						public boolean hasNext()
-						{return not_done;}
-						
-						public O next()
-						{
-							if(!hasNext())
-								throw new NoSuchElementException();
-							
-							if(itera.hasNext() && iterb.hasNext())
-								return (O) zip.Evaluate(new Pair(itera.next(), iterb.next()));
-							
-							
-							not_done = false;
-							return null;
-						}
-						protected boolean not_done = true;
-					};
-				}
-			};
+						if(!hasNext())
+							throw new NoSuchElementException();
+
+						return zip.Evaluate(pairedIter.next());
+					}
+				};
+			}
+		};
 	}
 	
 	/**
@@ -1114,6 +1094,9 @@ public final class LINQ
 		 */
 		public Pair(Pair<? extends S,? extends T> p)
 		{
+			if(p == null)
+				throw new NullPointerException();
+			
 			Item1 = p.Item1;
 			Item2 = p.Item2;
 			
